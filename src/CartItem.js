@@ -7,22 +7,44 @@ class CartItem extends React.Component {
         this.state = {
             price: 899,
             title: 'Phone',
-            qty: 1,
+            qty: 0,
             img: ''
         }
-    /*    this.increaseQuantity=this.increaseQuantity.bind(this)//we are doing this because without this the object reference will lost and function will return undefined because here we are assigning class refrence to a new var
-        this.decreaseQuantity=this.decreaseQuantity.bind(this)
-        this.deleteItems=this.deleteItems.bind(this)*/
+        /*    this.increaseQuantity=this.increaseQuantity.bind(this)//we are doing this because without this the object reference will lost and function will return undefined because here we are assigning class refrence to a new var
+            this.decreaseQuantity=this.decreaseQuantity.bind(this)
+            this.deleteItems=this.deleteItems.bind(this)*/
         // Instead of using binding we can also use arrow function which auto binds it
     }
-    increaseQuantity=()=> {
-        console.log("++") // here it will catch this.state bcz we have already binded this function in comstructor
+    increaseQuantity = () => {
+        // here it will catch this.state bcz we have already binded this function in comstructor
+        //there are two method of changing states 1. if you need previous state of object values,2. if you dont
+        //set state 1
+        /*
+        this.setState({
+            qty:this.state.qty+1
+        })
+        */
+        //second state
+        this.setState((prevState) => {
+            return {
+                qty: prevState.qty + 1
+            }
+        });
     }
-    decreaseQuantity=()=>{
-        console.log("--")
+    decreaseQuantity = () => {
+        this.setState((prevState)=>{
+            if(prevState.qty==0){
+                //here for now we are ony returning it we won't use alert inside a component
+                return   
+            }
+            return{
+                
+                qty:prevState.qty-1
+            }
+        });
 
     }
-    deleteItems=()=>{
+    deleteItems = () => {
         console.log("deleted")
 
     }
@@ -42,20 +64,20 @@ class CartItem extends React.Component {
 
                         {/* {Buttons} */}
                         <img alt='increase'
-                         className='action-icons' 
-                         src='https://cdn-icons.flaticon.com/png/512/3303/premium/3303893.png?token=exp=1642444667~hmac=255c275e48ba51a0e506598b8f67f0da'
-                         onClick={this.increaseQuantity}>
-                         </img>
-                        <img alt='decrease' 
-                        className='action-icons' 
-                        src='https://cdn-icons-png.flaticon.com/512/992/992683.png'
-                        onClick={this.decreaseQuantity}>
+                            className='action-icons'
+                            src='https://cdn-icons.flaticon.com/png/512/3303/premium/3303893.png?token=exp=1642444667~hmac=255c275e48ba51a0e506598b8f67f0da'
+                            onClick={this.increaseQuantity}>
+                        </img>
+                        <img alt='decrease'
+                            className='action-icons'
+                            src='https://cdn-icons-png.flaticon.com/512/992/992683.png'
+                            onClick={this.decreaseQuantity}>
                         </img>
                         <img alt='delete'
-                         className='action-icons' 
-                         src='https://cdn-icons.flaticon.com/png/512/484/premium/484662.png?token=exp=1642444692~hmac=48b83290bfdbcb78074f5314faa0c90f'
-                         onClick={this.deleteItems}>
-                         </img>
+                            className='action-icons'
+                            src='https://cdn-icons.flaticon.com/png/512/484/premium/484662.png?token=exp=1642444692~hmac=48b83290bfdbcb78074f5314faa0c90f'
+                            onClick={this.deleteItems}>
+                        </img>
                     </div>
 
                 </div>
