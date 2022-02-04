@@ -12,29 +12,29 @@ class App extends React.Component {
       products: [{
         price: 8990,
         title: 'Phone',
-        qty: 0,
-        img: '',
+        qty: 1,
+        img: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
         id: 1
       },
       {
         price: 8,
         title: 'Pen',
         qty: 10,
-        img: '',
+        img: 'https://media.istockphoto.com/photos/pen-picture-id1059543698?s=612x612',
         id: 2
       },
       {
         price: 89900,
         title: 'Laptop',
         qty: 1,
-        img: '',
+        img: 'https://media.istockphoto.com/photos/modern-laptop-on-white-background-picture-id1140541722',
         id: 3
       },
       {
         price: 89,
         title: 'Toy',
         qty: 1,
-        img: '',
+        img: 'https://media.istockphoto.com/photos/unicorn-plush-toy-sitting-isolated-on-white-background-picture-id1314268502?s=612x612',
         id: 4
       }
       ]
@@ -57,16 +57,29 @@ class App extends React.Component {
     }
 
     const handledecrease = (product) => {
-      //creating constraint if product is 0
-      if (product.qty <= 0) { return }
       const index = products.indexOf(product);//got the current item index 
       products[index].qty -= 1;
       this.setState({
         products: products
 
       })
+      //added constraint in case item is 0
+      if(product.qty===0 || product.qty <= 0){
+        handleDelete(product)
+      }
     }
+    const getCartCount=()=>{
+      const {products}=this.state;
+      let count=0;
+      products.forEach((product)=>{
+        count+=product.qty;
+        
+      })
+      return count
+    }
+
     const handleDelete = (product) => {
+
       //filtering data which are except this
       const temp = products.filter((prod) => {
         return prod.id !== product.id;
@@ -76,10 +89,29 @@ class App extends React.Component {
       })
 
     }
+
+    const getTotalPrice=()=>{
+      const {products}=this.state;
+      let cartTotal=0;
+      products.map((product)=>{
+        cartTotal+=product.price*product.qty;
+        return cartTotal
+      })
+      return cartTotal
+    }
     return (
       <div className="App">
-        <Navbar />
-        <Cart products={products} handleIncrease={handleIncrease} handledecrease={handledecrease} handleDelete={handleDelete} />
+        <Navbar getCartCount={getCartCount()}/>
+        <Cart 
+        products={products}
+         handleIncrease={handleIncrease} 
+         handledecrease={handledecrease}
+         handleDelete={handleDelete} 
+          />
+        <div style={{fontSize:'1.6rem',padding:4}}>
+          TOTAL:{getTotalPrice()}
+
+        </div>
       </div>
     );
   }
