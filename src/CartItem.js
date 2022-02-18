@@ -7,8 +7,11 @@ const CartItem = (props) => {
         handleIncrease,
         handledecrease,
         handleDelete } = props
-    const { price, title, qty } = props.product;
-    //here we are getting 3 values from this.state object so that we can directly use them instead of writing this.state.key
+    const { 
+        price,
+        title, 
+        qty } = props.product;
+        
     return (
 
         <div className='cart-item'>
@@ -24,7 +27,7 @@ const CartItem = (props) => {
                     {/* {Buttons} */}
                     <img alt='increase'
                         className='action-icons'
-                        src='https://cdn-icons.flaticon.com/png/512/1665/premium/1665629.png?token=exp=1644008968~hmac=c30d8a783293b2c59d68e2280fbb3140'
+                        src='https://cdn-icons.flaticon.com/png/512/3303/premium/3303893.png?token=exp=1644430542~hmac=2fe7cd5564aee05c77692b518999b991'
                         onClick={() => handleIncrease(product)}>
                     </img>
                     <img alt='decrease'

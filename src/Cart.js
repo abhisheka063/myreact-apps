@@ -10,8 +10,6 @@ const Cart = (props) => {
             {products.map((product) => {
                 return <CartItem product={product} key={product.id} handleIncrease={handleIncrease} handledecrease={handledecrease} handleDelete={handleDelete} />
             })}
-
-
         </div>
     )
 

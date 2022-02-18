@@ -1,116 +1,146 @@
-
-import React from 'react';
-import Cart from './Cart';
-import Navbar from './Navbar';
-
+import React from "react";
+import Cart from "./Cart";
+import Navbar from "./Navbar";
+import {
+  collection,
+  getFirestore,
+  setDoc,
+  doc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
+import { onSnapshot } from "firebase/firestore";
 
 class App extends React.Component {
   constructor() {
     super();
     //calling super because we are using class which is inheriting a parent class /we need to call his constructor here
     this.state = {
-      products: [{
-        price: 8990,
-        title: 'Phone',
-        qty: 1,
-        img: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
-        id: 1
-      },
-      {
-        price: 8,
-        title: 'Pen',
-        qty: 10,
-        img: 'https://media.istockphoto.com/photos/pen-picture-id1059543698?s=612x612',
-        id: 2
-      },
-      {
-        price: 89900,
-        title: 'Laptop',
-        qty: 1,
-        img: 'https://media.istockphoto.com/photos/modern-laptop-on-white-background-picture-id1140541722',
-        id: 3
-      },
-      {
-        price: 89,
-        title: 'Toy',
-        qty: 1,
-        img: 'https://media.istockphoto.com/photos/unicorn-plush-toy-sitting-isolated-on-white-background-picture-id1314268502?s=612x612',
-        id: 4
-      }
-      ]
-    }
+      products: [],
+      loading: true,
+    };
+    this.db = getFirestore();
+    this.call = collection(this.db, "products");
+
     /*  this.increaseQuantity=this.increaseQuantity.bind(this)//we are doing this because without this the object 
     reference will lost and function will return undefined because here we are assigning class refrence to a new var
     */
-    // Instead of using binding we can also use arrow function which auto binds it
   }
-  render() {
-    const { products } = this.state;
-    const handleIncrease = (product) => {
-      const index = products.indexOf(product);//got the current item index 
-      console.log(product[index], index);
-      products[index].qty += 1;
-      this.setState({
-        products: products
-
-      })
-    }
-
-    const handledecrease = (product) => {
-      const index = products.indexOf(product);//got the current item index 
-      products[index].qty -= 1;
-      this.setState({
-        products: products
-
-      })
-      //added constraint in case item is 0
-      if(product.qty===0 || product.qty <= 0){
-        handleDelete(product)
+  // Instead of using binding we can also use arrow function which auto binds it
+  componentDidMount() {
+    //we can also use getDocs(call) it return promise but here using snapshot for realtime update
+    onSnapshot(
+      this.call,
+      (item) => {
+        console.log("again");
+        const products = item.docs.map((doc) => {
+          const data = doc.data();
+          data["id"] = doc.id;
+          console.log("again");
+          return data;
+        });
+        this.setState({
+          products: products,
+          loading: false,
+        });
+      },
+      (error) => {
+        console.log(error);
       }
-    }
-    const getCartCount=()=>{
-      const {products}=this.state;
-      let count=0;
-      products.forEach((product)=>{
-        count+=product.qty;
-        
-      })
-      return count
-    }
+    );
+  }
 
-    const handleDelete = (product) => {
+  //Functions
 
-      //filtering data which are except this
-      const temp = products.filter((prod) => {
-        return prod.id !== product.id;
-      })
-      this.setState({
-        products: temp
-      })
+  handleIncrease = (product) => {
+    const { products } = this.state;
 
+    const index = products.indexOf(product); //got the current item index
+    const docRef = doc(this.db, "products", products[index].id);
+
+    updateDoc(docRef, {
+      qty: products[index].qty + 1,
+    }).then(() => {
+      console.log("Updated");
+    });
+  };
+
+  handledecrease = (product) => {
+    const { products } = this.state;
+    const index = products.indexOf(product);
+    const docRef = doc(this.db, "products", products[index].id);
+    updateDoc(docRef, {
+      qty: products[index].qty - 1,
+    }).then(() => {
+      console.log("Updated-del");
+    });
+    //added constraint in case item is 0
+    if (product.qty === 0 || product.qty <= 0) {
+      this.handleDelete(product);
+      console.log("below");
     }
+  };
 
-    const getTotalPrice=()=>{
-      const {products}=this.state;
-      let cartTotal=0;
-      products.map((product)=>{
-        cartTotal+=product.price*product.qty;
-        return cartTotal
-      })
-      return cartTotal
-    }
+  handleDelete = (product) => {
+    const { products } = this.state;
+    const docRef = doc(this.db, "products", product.id);
+    deleteDoc(docRef).then(() => {
+      console.log("Deleted");
+    });
+  };
+
+  getCartCount = () => {
+    const { products } = this.state;
+    let count = 0;
+    products.forEach((product) => {
+      count += product.qty;
+    });
+    return count;
+  };
+
+  getTotalPrice = () => {
+    const { products } = this.state;
+    let cartTotal = 0;
+    products.map((product) => {
+      cartTotal += product.price * product.qty;
+      return cartTotal;
+    });
+    return cartTotal;
+  };
+  addItems = () => {
+    // this.call
+    setDoc(doc(this.call), {
+      title: "Test",
+      qty: 1,
+      price: 872,
+      img: "",
+    }).then(() => {
+      console.log("Added");
+    });
+  };
+
+  render() {
+    const { products, loading } = this.state;
+
     return (
       <div className="App">
-        <Navbar getCartCount={getCartCount()}/>
-        <Cart 
-        products={products}
-         handleIncrease={handleIncrease} 
-         handledecrease={handledecrease}
-         handleDelete={handleDelete} 
-          />
-        <div style={{fontSize:'1.6rem',padding:4}}>
-          TOTAL:{getTotalPrice()}
-
+        <Navbar getCartCount={this.getCartCount()} />
+        <button
+          onClick={() => this.addItems()}
+          style={{ padding: 5, width: 100, margin: 4 }}
+        >
+          Add items
+        </button>
+        <Cart
+          products={products}
+          handleIncrease={this.handleIncrease}
+          handledecrease={this.handledecrease}
+          handleDelete={this.handleDelete}
+        />
+        {loading && <h1>Loading..</h1>}
+        <div style={{ fontSize: "1.6rem", padding: 4 }}>
+          TOTAL:{this.getTotalPrice()}
         </div>
       </div>
     );
